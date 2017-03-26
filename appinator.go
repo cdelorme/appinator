@@ -42,45 +42,45 @@ type appinator struct {
 	Debug      bool   `json:"debug,omitempty"`
 }
 
-func (self *appinator) Build() error {
-	if self.Name == "" {
-		self.Name = filepath.Base(self.App)
+func (a *appinator) Build() error {
+	if a.Name == "" {
+		a.Name = filepath.Base(a.App)
 	}
-	self.Contents = self.Name + "#"
+	a.Contents = a.Name + "#"
 
-	if self.Debug && runtime.GOOS == "darwin" {
-		if err := os.MkdirAll(self.Name+".app/Contents/MacOS/", 0755); err != nil {
+	if a.Debug && runtime.GOOS == "darwin" {
+		if err := os.MkdirAll(a.Name+".app/Contents/MacOS/", 0755); err != nil {
 			return err
-		} else if err = os.Symlink(self.App, self.Name+".app/Contents/MacOS/"+self.Name); err != nil {
+		} else if err = os.Symlink(a.App, a.Name+".app/Contents/MacOS/"+a.Name); err != nil {
 			return err
 		}
-	} else if err := copy(self.App, self.Name+".app/Contents/MacOS/"+self.Name); err != nil {
+	} else if err := copy(a.App, a.Name+".app/Contents/MacOS/"+a.Name); err != nil {
 		return err
 	}
 
-	if err := copy(self.Resources, self.Name+".app/Contents/Resources"); err != nil {
+	if err := copy(a.Resources, a.Name+".app/Contents/Resources"); err != nil {
 		return err
-	} else if err = copy(self.Icon, self.Name+".app/Contents/Resources/Icon"); err != nil {
+	} else if err = copy(a.Icon, a.Name+".app/Contents/Resources/Icon"); err != nil {
 		return err
-	} else if err = copy(self.Docs, self.Name+".app/Contents/Resources/Docs"); err != nil {
+	} else if err = copy(a.Docs, a.Name+".app/Contents/Resources/Docs"); err != nil {
 		return err
-	} else if err = copy(self.Frameworks, self.Name+".app/Contents/Frameworks"); err != nil {
+	} else if err = copy(a.Frameworks, a.Name+".app/Contents/Frameworks"); err != nil {
 		return err
 	}
 
-	if InfoPlist, err := os.Create(self.Name + ".app/Contents/Info.plist"); err != nil {
+	if InfoPlist, err := os.Create(a.Name + ".app/Contents/Info.plist"); err != nil {
 		return err
 	} else if InfoTemplate, err := template.New("Info.plist").Parse(InfoPlistTemplate); err != nil {
 		return err
-	} else if err := InfoTemplate.Execute(InfoPlist, self); err != nil {
+	} else if err := InfoTemplate.Execute(InfoPlist, a); err != nil {
 		return err
 	} else if err := InfoPlist.Close(); err != nil {
 		return err
 	}
 
-	if PkgInfo, err := os.Create(self.Name + ".app/Contents/PkgInfo"); err != nil {
+	if PkgInfo, err := os.Create(a.Name + ".app/Contents/PkgInfo"); err != nil {
 		return err
-	} else if _, err := PkgInfo.WriteString(self.Contents); err != nil {
+	} else if _, err := PkgInfo.WriteString(a.Contents); err != nil {
 		return err
 	} else if err := PkgInfo.Close(); err != nil {
 		return err

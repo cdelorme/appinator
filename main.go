@@ -1,20 +1,20 @@
 package main
 
 import (
-	"github.com/cdelorme/go-log"
+	"github.com/cdelorme/glog"
 	"github.com/cdelorme/gonf"
 )
 
 const defaultPackageName = "com.example"
 
 func main() {
-	logger := &log.Logger{}
+	logger := &glog.Logger{}
 
 	app := &appinator{
 		Package: defaultPackageName,
 	}
 
-	conf := gonf.Gonf{Description: "simple osx application bundler", Configuration: app}
+	conf := gonf.Config{Description: "simple osx application bundler", Target: app}
 	conf.Add("name", "override for app name", "", "-n", "--name")
 	conf.Add("app", "executable path", "", "-a", "--app")
 	conf.Add("package", "package name (default `com.example`)", "", "-p", "--package")
