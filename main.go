@@ -9,12 +9,11 @@ const defaultPackageName = "com.example"
 
 func main() {
 	logger := &glog.Logger{}
+	app := &appinator{Package: defaultPackageName}
 
-	app := &appinator{
-		Package: defaultPackageName,
-	}
-
-	conf := gonf.Config{Description: "simple osx application bundler", Target: app}
+	conf := gonf.Config{}
+	conf.Target(app)
+	conf.Description("simple osx application bundler")
 	conf.Add("name", "override for app name", "", "-n", "--name")
 	conf.Add("app", "executable path", "", "-a", "--app")
 	conf.Add("package", "package name (default `com.example`)", "", "-p", "--package")
@@ -25,7 +24,7 @@ func main() {
 	conf.Add("debug", "enable debug, use symlink", "", "-d", "--debug")
 	conf.Load()
 
-	logger.Debug("app: %#v", app)
+	logger.Debug("%#v", app)
 
 	if err := app.Build(); err != nil {
 		logger.Error(err.Error())
